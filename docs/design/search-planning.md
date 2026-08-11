@@ -1,198 +1,314 @@
 # Screen: Search Planning
 
-Core screen #1 (per `docs/design/ui-specification.md`): **Goal & Direction definition**.
+Core screen #1 (per `docs/design/ui-specification.md`): **Goal & Direction
+definition**.
 
 Position in the metacognitive cycle:
 
 ```text
-[ Search Planning ] → Search → Triage → Save → Organize → Stop → Re-acquaint → Resume
+[ PLANNING ] → Monitoring → Evaluation → Revision → Search Triage → Organization → Cross-Session Resumption
 ```
 
-This is the entry point to a search project. It is where the user externalizes
-their metacognitive plan *before* searching, so the plan — not the user's
-memory — becomes the reference point for every later stage (triage,
-organizing, and especially cross-session resumption).
+This screen is the entry point of a search project — where the user
+externalizes their plan *before* searching, so the plan (not the user's
+memory) becomes the anchor referenced by every later stage, especially
+Resume / Re-acquaint.
 
 ---
 
-## Purpose
+## 1. Visual Layouts (ASCII Wireframes)
 
-Give the user a place to articulate, in their own words, what they are trying
-to find out and why — before generating any search results. This plan is
-saved as persistent state and is what the Resume / Re-acquaint screen shows
-the user when they return after an interruption.
+### State A — New Search Project (empty)
 
-This screen supports the **Planning** phase of the metacognitive cycle
-specifically. It does not show search results, does not evaluate sources,
-and does not perform any information extraction.
+```
++============================================================================+
+|  ACADEMIC EXPLORATORY SEARCH                              [STATE: NEW]     |
++============================================================================+
+|                                                                            |
+|  SEARCH PLANNING                                                          |
+|  Define what you're trying to find out before you start searching.       |
+|                                                                            |
++----------------------------------------------------------------------------+
+|  SEARCH GOAL                                                              |
+|----------------------------------------------------------------------------|
+|  [ e.g. "Understand metacognitive scaffolding in exploratory search" ]    |
+|                                                                            |
++----------------------------------------------------------------------------+
+|  WHAT I KNOW  (short notes — optional)                                    |
+|----------------------------------------------------------------------------|
+|  >  [ .......................................................... ]        |
+|  >  [ .......................................................... ]        |
+|  [+ Add another note]                                                     |
++----------------------------------------------------------------------------+
+|  WHAT I WANT TO FIND OUT                                                  |
+|----------------------------------------------------------------------------|
+|  >  [ .......................................................... ]        |
+|  >  [ .......................................................... ]        |
+|  [+ Add another note]                                                     |
++----------------------------------------------------------------------------+
+|  SEARCH DIRECTION(S)                                                      |
+|----------------------------------------------------------------------------|
+|  [ Type a direction to explore...                     ]   [ + Add ]       |
+|                                                                            |
+|  (no directions added yet)                                                |
++----------------------------------------------------------------------------+
+|                                                                            |
+|   ┌ AI SUGGESTION ─────────────────────────────────────────────────────┐  |
+|   |  Fill in "Goal" and "What I Want to Find Out" above, and an AI      |  |
+|   |  suggested direction will appear here for you to accept or change. |  |
+|   └───────────────────────────────────────────────────────────────────┘  |
+|                                                                            |
++----------------------------------------------------------------------------+
+|                                                                            |
+|        [ Start Searching ]   <- disabled until Goal + 1 Direction exist   |
+|                                                                            |
+|                    Save Plan for Later (no search yet)                    |
+|                                                                            |
++============================================================================+
+```
+
+### State B — Returning / Existing Project, New Session
+
+```
++============================================================================+
+|  ACADEMIC EXPLORATORY SEARCH                    [STATE: EXISTING PROJECT]  |
++============================================================================+
+|  SEARCH GOAL (set previously)                                              |
+|  "Understand metacognitive scaffolding in exploratory search"    [Edit]   |
++----------------------------------------------------------------------------+
+|                                                                            |
+|  SEARCH PLANNING — New Session                                            |
+|  Continue a previous direction, or define a new one.                     |
+|                                                                            |
++----------------------------------------------------------------------------+
+|  PRIOR DIRECTIONS                                                         |
+|----------------------------------------------------------------------------|
+|  ● Eye-tracking studies on dyslexia .................. [ACTIVE]           |
+|      3 saved · last searched 2026-08-04         [ Continue this ]         |
+|                                                                            |
+|  ○ Search interface accessibility .................... [PARKED]          |
+|      1 saved · last searched 2026-07-22         [ Continue this ]         |
++----------------------------------------------------------------------------+
+|  WHAT I KNOW  (this session — optional)                                   |
+|----------------------------------------------------------------------------|
+|  >  [ .......................................................... ]        |
+|  [+ Add another note]                                                     |
++----------------------------------------------------------------------------+
+|  WHAT I WANT TO FIND OUT  (this session)                                  |
+|----------------------------------------------------------------------------|
+|  >  [ .......................................................... ]        |
+|  [+ Add another note]                                                     |
++----------------------------------------------------------------------------+
+|  NEW SEARCH DIRECTION                                                     |
+|----------------------------------------------------------------------------|
+|  [ Type a new direction to explore...                 ]   [ + Add ]       |
++----------------------------------------------------------------------------+
+|                                                                            |
+|   ┌ AI SUGGESTION ────────────────────────────────────── [AI] ─────────┐  |
+|   |  Based on what you want to find out, this may fit:                 |  |
+|   |                                                                     |  |
+|   |     "Cognitive load in academic search interfaces"                 |  |
+|   |                                                                     |  |
+|   |     [ Accept ]      [ Change ]      [ Dismiss ]                    |  |
+|   └─────────────────────────────────────────────────────────────────┘  |
+|                                                                            |
++----------------------------------------------------------------------------+
+|                                                                            |
+|   [ Start Searching ]                                                     |
+|                                                                            |
+|              Save Plan for Later (no search yet)                          |
+|                                                                            |
++============================================================================+
+```
+
+### State C — Goal Edit (modal / inline, triggered from State B's `[Edit]`)
+
+```
++============================================================================+
+|  EDIT SEARCH GOAL                                              [ X Close ] |
++----------------------------------------------------------------------------+
+|                                                                            |
+|  SEARCH GOAL                                                              |
+|  [ Understand metacognitive scaffolding in exploratory search       ]    |
+|                                                                            |
+|  Changing this will not remove your saved results or prior directions.   |
+|                                                                            |
+|                    [ Cancel ]           [ Save Goal ]                     |
+|                                                                            |
++============================================================================+
+```
 
 ---
 
-## User State
+## 2. Purpose & Metacognitive Role
 
-The screen has two entry states. Layout and field order stay identical
-between them (predictable layout), only content and emphasis change.
+**Primary objective:** give the user a place to articulate — in their own
+words — what they are trying to find out and why, before any search results
+exist. This becomes the persistent plan that the Resume / Re-acquaint screen
+later reconstructs for the user.
 
-### State A — New Search Project
-- No goal exists yet.
-- All fields are empty.
-- Framing is a light prompt, not a form demand (e.g. placeholder text, not
-  required-field markers).
+**Position in the cycle:** this screen is the entry point for **Planning**.
+It also lightly touches **Monitoring** (State B surfaces prior directions
+so the user can see where things stand) and **Revision** (Edit Goal, AI
+"tidy" suggestions), but it performs no Evaluation, Search Triage, or
+Organization itself — those belong to later screens.
 
-### State B — Existing Search Project, Starting a New Session
-- A Search Goal already exists from a prior session.
-- The Goal is shown as a persistent, read-only anchor (edit is an explicit,
-  separate action, not inline free editing) so it can't be accidentally
-  altered while the user is thinking about something else.
-- Previously explored Search Directions are visible in compact/summarized
-  form, so the user can decide to continue one of them or define a new one.
+This screen shows no search results, performs no document reading, and
+generates no claims/evidence — consistent with `CLAUDE.md` §4–§5.
 
 ---
 
-## Visible Information
+## 3. User States
 
-| Information | State A (new) | State B (returning) |
-|---|---|---|
-| Search Goal | empty input | persistent, read-only summary + "Edit Goal" |
-| What I Know | empty input | empty input (fresh per session; prior sessions' notes live in Resume/Re-acquaint) |
-| What I Want to Find Out | empty input | empty input |
-| Search Direction(s) | empty | new direction input + list of prior directions with status (active / parked) |
-| AI Suggested Direction | hidden until enough input exists | same |
+### State A — New / First-Time
+- No Search Goal exists yet.
+- All fields empty; framing is a light prompt (placeholder text), not a
+  demanding form.
+- AI Suggestion module is present but inert until enough input exists.
 
-No result counts, no metrics, no analytics widgets — this screen contains
+### State B — Returning / Existing Project, New Session
+- A Search Goal already exists from a prior session and is shown as a
+  **persistent, read-only anchor** — editable only via an explicit action,
+  never inline, so it can't be changed by accident mid-thought.
+- Prior Search Directions are visible in summarized form (status badge +
+  last activity), so the user can resume one instead of starting fresh.
+- "What I Know" / "What I Want to Find Out" are fresh, empty fields
+  scoped to *this* session (history of prior sessions' notes lives on the
+  Resume / Re-acquaint screen, not here).
+
+### State C — Goal Edit (sub-state of B)
+- Triggered only by the explicit "Edit" action.
+- Isolated, single-purpose surface: change the Goal text, nothing else.
+- Reassures the user that editing the goal does not discard saved work.
+
+---
+
+## 4. Visible Information Matrix
+
+| Information | State A (New) | State B (Returning) | State C (Goal Edit) |
+|---|---|---|---|
+| Search Goal | empty input | read-only anchor + Edit action | editable input |
+| What I Know | empty input | empty input (session-scoped) | — |
+| What I Want to Find Out | empty input | empty input (session-scoped) | — |
+| Search Direction(s) | empty, add-new only | prior directions (status + last activity) + add-new | — |
+| AI Suggested Direction | hidden/inert placeholder | active, populated | — |
+| AI "tidy" affordance | available per field once text exists | available per field | — |
+| State badge | "NEW" | "EXISTING PROJECT" | — |
+| Primary CTA state | disabled until Goal + 1 Direction | enabled once a direction is chosen/added | — |
+
+No result counts, metrics, or analytics widgets appear in any state —
 only plan content and (in State B) orientation cues.
 
 ---
 
-## Components
+## 5. Component Breakdown
 
-1. **Persistent Orientation Bar** *(State B only)*
-   Shows the Search Goal at all times, small and non-editable in place.
-   Includes an explicit "Edit Goal" action.
-
-2. **Search Goal field**
-   Short text input. First-time entry in State A; view-only + edit affordance
-   in State B.
-
-3. **What I Know field**
-   Short, chunked input (2–3 short bullet-style entries, not one dense
-   paragraph box) — what the user already understands about the topic.
-
-4. **What I Want to Find Out field**
-   Same chunked structure as above — what's still unknown / the target of
-   the search.
-
-5. **Search Direction input**
-   Add one or more short phrases describing a specific angle to explore
-   (e.g. *"Eye-tracking studies on dyslexia"*). Each becomes a removable
-   chip/tag. At least one direction is needed to proceed, but only one is
-   required.
-
-6. **Prior Directions summary** *(State B only)*
-   Compact list of directions already explored in earlier sessions, each
-   labeled active or parked. Read-only here — this is orientation, not
-   history browsing (deep history lives on the Session History screen).
-   Selecting a prior direction offers to continue it instead of typing a
-   new one.
-
-7. **AI Suggested Direction module** *(appears only once Goal + "What I Want
-   to Find Out" are filled)*
-   One short suggested direction phrase, generated from the user's own
-   planning text. Visually tagged as AI content (tint + icon + border +
-   label), with `[ Accept ] [ Change ] [ Dismiss ]`.
-
-8. **AI "Tidy This Up" affordance** *(optional, per field)*
-   Lets the AI restructure the user's own Goal / What I Know / What I Want
-   to Find Out text into a clearer, shorter version. Same
-   accept/change/dismiss pattern. Never adds content the user didn't write.
-
-9. **Primary action — "Start Searching"**
-   Advances to Academic Search Results using the selected/entered direction.
-
-10. **Secondary action — "Save Plan for Later"**
-    Persists the plan without entering search results. Low-emphasis
-    (text link, not a competing button), for the case where a user wants to
-    plan now and search later.
+| Component | Function | Interaction | State Behavior |
+|---|---|---|---|
+| State badge (top-right) | Orients user to New vs. Existing context | Read-only | Shown in A & B; absent in C |
+| Persistent Orientation Bar (Goal) | Keeps Goal visible at all times | Read-only text + `[Edit]` button | Absent in A (no goal yet); present in B; expands to editable form in C |
+| Search Goal field | Capture the overall objective | Single-line text input | Editable form in A; read-only + edit-trigger in B; editable in C |
+| What I Know field | Capture existing understanding | Chunked short-text inputs, "+Add" to append | Always empty per new session |
+| What I Want to Find Out field | Capture the target of the search | Chunked short-text inputs, "+Add" to append | Always empty per new session |
+| Search Direction input | Define a specific angle to explore | Text input + "+Add" → becomes a chip | Available in both A and B |
+| Prior Directions summary | Show previously explored angles with status | Read-only list + "Continue this" per item | State B only |
+| AI Suggested Direction module | Offer a candidate direction from the user's own text | `[Accept] [Change] [Dismiss]` | Inert placeholder in A until inputs exist; active in B |
+| AI "tidy this up" affordance | Offer restructured phrasing of user's own text | Per-field, same accept/change/dismiss pattern | Available once a field has content |
+| Start Searching (CTA) | Advance to search | Single click/tap | Disabled until Goal + ≥1 Direction present |
+| Save Plan for Later | Persist plan without searching | Low-emphasis text link | Available in A and B |
+| Edit Goal control | Deliberate, explicit goal revision | Opens State C | Only reachable from B |
+| Cancel / Save Goal (State C) | Commit or discard goal edit | Two buttons | State C only |
 
 ---
 
-## AI-Generated Content
+## 6. AI vs. User Content
 
-- **Suggested Search Direction** — inferred only from the user's own Goal
-  and "What I Want to Find Out" text. No document data, no external
-  knowledge injected.
-- **Tidied phrasing** of user-authored plan text (restructuring only, per
-  CLAUDE.md §12 — "restructuring user-provided search plans" is an explicit
-  in-scope AI capability).
+**AI-generated:**
+- *Suggested Search Direction* — inferred only from the user's own Goal and
+  "What I Want to Find Out" text. No document data or outside knowledge is
+  injected.
+- *Tidied phrasing* of user-authored Goal / What I Know / What I Want to
+  Find Out text (restructuring only — CLAUDE.md §12 explicitly allows
+  "restructuring user-provided search plans").
 
-Both are clearly labeled as suggestions, traceable to the user's own input,
-and require a single explicit action (Accept/Change/Dismiss) to take effect.
-Nothing from the AI is auto-applied.
+Both are visually distinct per `ui-specification.md` §"AI Assistance &
+Scaffolding": tinted background, `[AI]` tag, distinct border, and an
+explicit label — never color alone. Both require one explicit action
+(`Accept` / `Change` / `Dismiss`) before taking effect; nothing is
+auto-applied.
 
----
-
-## User-Generated Content
-
+**User-authored:**
 - Search Goal
 - What I Know
 - What I Want to Find Out
 - Search Direction(s)
-- Accept / Change / Dismiss decisions on any AI suggestion
-- Choice to continue a prior direction vs. define a new one (State B)
+- The Accept / Change / Dismiss decision itself
+- The choice to continue a prior direction vs. start a new one (State B)
+
+The AI never originates a Goal from nothing — it only reflects back or
+restructures what the user has already written.
 
 ---
 
-## Interaction
+## 7. Interaction & Transitions
 
-- Short-field text entry (chunked, not paragraph boxes)
-- Add / remove Direction chips
-- Single-tap Accept / Change / Dismiss on AI suggestions
-- Explicit "Edit Goal" action required to change the persistent Goal
-  (prevents accidental drift of the anchor the rest of the system relies on)
-- Primary CTA is disabled until Goal + at least one Direction exist
+**Input mechanisms:**
+- Short chunked text fields (not large paragraph boxes) for Goal / What I
+  Know / What I Want to Find Out
+- "+Add" to append additional short notes/directions
+- Chip-style removable tags for Search Directions
+- Single-tap `Accept` / `Change` / `Dismiss` for all AI content
+- Explicit `[Edit]` action required to modify an existing Goal (State B → C)
+
+**Primary transition:**
+- `[ Start Searching ]` → **Academic Search Results** screen. The chosen
+  Direction becomes the active query context and appears in the persistent
+  orientation header; the Goal remains visible throughout downstream
+  screens.
+- If multiple Directions exist, the user picks which to search first
+  (default: the one just added or explicitly continued).
+
+**Secondary transition:**
+- `Save Plan for Later` → returns to the project's holding state without
+  entering results; the plan becomes available to the Resume / Re-acquaint
+  screen on return.
+
+**State C transitions:**
+- `[ Save Goal ]` → returns to State B with the updated Goal shown in the
+  orientation bar.
+- `[ Cancel ]` / `[ X Close ]` → returns to State B unchanged.
 
 ---
 
-## Transition to Next State
+## 8. Strict Scope Justification Table
 
-- **"Start Searching"** → *Academic Search Results* screen. The chosen
-  Direction becomes the active query context and is shown in the persistent
-  orientation header; Goal remains visible throughout.
-- If more than one Direction exists, the user picks which one to search
-  first (default: the one just added/selected).
-- **"Save Plan for Later"** → returns to the project's current holding state
-  without entering results, with the plan now available for the Resume /
-  Re-acquaint screen on return.
+| Component | Planning | Monitoring | Evaluation | Revision | Search Triage | Organization | Cross-Session Resumption |
+|---|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
+| Persistent Orientation Bar (Goal) | | ✓ | | | | | ✓ |
+| Search Goal field | ✓ | | | | | | |
+| What I Know field | ✓ | | ✓ | | | | |
+| What I Want to Find Out field | ✓ | | | | | | |
+| Search Direction input | ✓ | | | | | ✓ | |
+| Prior Directions summary | | ✓ | | ✓ | | | ✓ |
+| AI Suggested Direction module | ✓ | | | | | | |
+| AI "tidy this up" affordance | | | | ✓ | | | |
+| Start Searching (CTA) | ✓ | | | | | | |
+| Save Plan for Later | | | | | | | ✓ |
+| Edit Goal control | | | | ✓ | | | |
 
----
-
-## Component Justification
-
-Every component maps to at least one required metacognitive/scope function:
-
-| Component | Function(s) supported |
-|---|---|
-| Persistent Orientation Bar | Monitoring, cross-session resumption |
-| Search Goal field | Planning |
-| What I Know field | Planning, evaluation (baseline for judging new results) |
-| What I Want to Find Out field | Planning |
-| Search Direction input | Planning, organization |
-| Prior Directions summary | Monitoring, revision, cross-session resumption |
-| AI Suggested Direction | Planning (assistive) |
-| AI "Tidy This Up" | Revision |
-| Edit Goal action | Revision |
-| Start Searching (CTA) | Planning → search transition |
-| Save Plan for Later | Cross-session resumption |
-
-No component was added for visual richness alone; each ties directly back
-to a function in `CLAUDE.md` §20's scope checklist.
+*What I Know* is marked Evaluation because it becomes the baseline the user
+later judges new search results against. Every other row maps directly to
+its column. No component exists purely for visual appeal — this satisfies
+the rule in `design-screen.md`: *"Do not add features merely because they
+look useful."*
 
 ---
 
 ## Explicitly Out of Scope on This Screen
 
 - No document/paper content, no PDF access.
-- No claims, evidence, or research-gap generation.
+- No claims, evidence, or research-gap generation (CLAUDE.md §5, §17
+  Explicitly Rejected Direction).
 - No result list, no metrics dashboard, no analytics visualization.
-- No automatic goal-setting — the AI only restructures or suggests based on
-  what the user already wrote; it never originates a Goal from nothing.
+- No automatic goal-setting — AI only reflects/restructures what the user
+  already wrote; it never originates a Goal unprompted.
